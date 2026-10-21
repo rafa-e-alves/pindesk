@@ -30,6 +30,7 @@ namespace PinDesk
 
         public const uint GW_HWNDPREV = 3;
         public const uint GW_OWNER = 4;
+        public const uint GA_ROOT = 2;
 
         public const int SM_CXSMICON = 49;
 
@@ -62,6 +63,12 @@ namespace PinDesk
         public struct RECT
         {
             public int Left, Top, Right, Bottom;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct POINT
+        {
+            public int X, Y;
         }
 
         [StructLayout(LayoutKind.Sequential)]
@@ -108,6 +115,12 @@ namespace PinDesk
 
         [DllImport("user32.dll")]
         public static extern IntPtr GetWindow(IntPtr hWnd, uint cmd);
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr WindowFromPoint(POINT point);
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetAncestor(IntPtr hWnd, uint flags);
 
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
@@ -199,9 +212,21 @@ namespace PinDesk
         [DllImport("user32.dll", EntryPoint = "GetClassLongPtr", CharSet = CharSet.Unicode)]
         static extern IntPtr GetClassLongPtr64(IntPtr hWnd, int index);
 
+        [DllImport("user32.dll", EntryPoint = "SetWindowLong", CharSet = CharSet.Unicode)]
+        static extern int SetWindowLong32(IntPtr hWnd, int index, int value);
+
+        [DllImport("user32.dll", EntryPoint = "SetWindowLongPtr", CharSet = CharSet.Unicode)]
+        static extern IntPtr SetWindowLongPtr64(IntPtr hWnd, int index, IntPtr value);
+
         public static long GetWindowLongPtr(IntPtr hWnd, int index)
         {
             return IntPtr.Size == 8 ? GetWindowLongPtr64(hWnd, index).ToInt64() : GetWindowLong32(hWnd, index);
+        }
+
+        public static void SetWindowLongPtr(IntPtr hWnd, int index, long value)
+        {
+            if (IntPtr.Size == 8) SetWindowLongPtr64(hWnd, index, new IntPtr(value));
+            else SetWindowLong32(hWnd, index, (int)value);
         }
 
         public static IntPtr GetClassLongPtr(IntPtr hWnd, int index)

@@ -99,7 +99,7 @@ namespace PinDesk
         protected override void OnMouseUp(MouseEventArgs e)
         {
             base.OnMouseUp(e);
-            if (e.Button == MouseButtons.Left) Finish(WinUtil.WindowAt(Cursor.Position));
+            if (e.Button == MouseButtons.Left) Finish(WindowUnder(Cursor.Position));
             else if (e.Button == MouseButtons.Right) Finish(IntPtr.Zero);
         }
 
@@ -121,7 +121,7 @@ namespace PinDesk
         void UpdateHover(bool force)
         {
             Point pt = Cursor.Position;
-            IntPtr h = WinUtil.WindowAt(pt);
+            IntPtr h = WindowUnder(pt);
             if (h != hover || force)
             {
                 hover = h;
@@ -144,6 +144,22 @@ namespace PinDesk
                     hint.SetText("Fixar: " + title, "Clique pra fixar  ·  Esc cancela");
             }
             hint.MoveNear(pt);
+        }
+
+        // Deixa esta camada transparente ao clique só durante o teste, pra o Windows
+        // dizer qual janela está de fato embaixo dela.
+        IntPtr WindowUnder(Point pt)
+        {
+            long ex = Native.GetWindowLongPtr(Handle, Native.GWL_EXSTYLE);
+            Native.SetWindowLongPtr(Handle, Native.GWL_EXSTYLE, ex | Native.WS_EX_TRANSPARENT);
+            try
+            {
+                return WinUtil.WindowAt(pt);
+            }
+            finally
+            {
+                Native.SetWindowLongPtr(Handle, Native.GWL_EXSTYLE, ex);
+            }
         }
 
         void InvalidateArea(Rectangle r)

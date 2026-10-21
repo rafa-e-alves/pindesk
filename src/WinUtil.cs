@@ -122,22 +122,17 @@ namespace PinDesk
             return list;
         }
 
-        // Janela de cima que está embaixo do ponto, ignorando as do próprio PinDesk.
+        // Janela que receberia um clique nesse ponto. Usa o teste do próprio Windows, que respeita
+        // partes transparentes (ex.: o meio da moldura do ScreenToGif deixa o clique passar).
+        // Janelas do PinDesk que estiverem por cima precisam estar "transparentes ao clique" antes.
         public static IntPtr WindowAt(Point pt)
         {
-            IntPtr found = IntPtr.Zero;
-            Native.EnumWindows((h, l) =>
-            {
-                if (!Native.IsWindowVisible(h) || Native.IsIconic(h) || IsOwn(h) || IsCloaked(h)) return true;
-                if ((GetExStyle(h) & Native.WS_EX_TRANSPARENT) != 0) return true;
-                Rectangle r = GetFrame(h);
-                if (r.Width <= 0 || r.Height <= 0 || !r.Contains(pt)) return true;
-                if (ShellClasses.Contains(GetClassName(h))) return false;
-                if (GetTitle(h).Length == 0) return true;
-                found = h;
-                return false;
-            }, IntPtr.Zero);
-            return IsPinnable(found) ? found : IntPtr.Zero;
+            var p = new Native.POINT();
+            p.X = pt.X;
+            p.Y = pt.Y;
+            IntPtr hit = Native.WindowFromPoint(p);
+            IntPtr root = hit == IntPtr.Zero ? IntPtr.Zero : Native.GetAncestor(hit, Native.GA_ROOT);
+            return IsPinnable(root) ? root : IntPtr.Zero;
         }
 
         public static Bitmap GetIconBitmap(IntPtr h, int size)

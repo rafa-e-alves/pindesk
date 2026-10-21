@@ -2,8 +2,7 @@
 
 Fixa qualquer janela do Windows **sempre no topo**: Bloco de Notas, navegador, player de vídeo, calculadora, o que for. Fica rodando na bandeja do sistema e não precisa instalar nada.
 
-<!-- Grava um GIF curto usando o app, salva em docs/demo.gif e tira o comentário da linha abaixo -->
-<!-- ![PinDesk em ação](docs/demo.gif) -->
+![PinDesk em ação](docs/demo.gif)
 
 ## Funcionalidades
 

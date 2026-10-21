@@ -1,0 +1,9 @@
+# Gerados pelo build.ps1
+PinDesk.exe
+src/PinDesk.ico
+
+# Windows / editores
+Thumbs.db
+desktop.ini
+.vs/
+.vscode/
